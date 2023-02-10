@@ -217,14 +217,14 @@ class WebServer {
           // TODO: Include error handling here with a correct error code and
           // a response that makes sense
           //First if num1 or num2 is invalid
-          if((num1 != (int)num1)   || (num2 =! (int)num2)){
+          if(num1 != (int)num1 || num2 != (int)num2){
             builder.append("HTTP/1.1 400 Bad Request");
             builder.append("Content-Type: text/html; charset=utf-8\n");
             builder.append("\n");
             builder.append("Invalid Data Entered");
           }
           //second if num1 or num2 is null/missing
-          else if((num1 == NULL)   || (num2 == NULL)){
+          else if((num1 == null) || (num2 == null)){
             builder.append("HTTP/1.1 206 Content Missing");
             builder.append("Content-Type: text/html; charset=utf-8\n");
             builder.append("\n");
