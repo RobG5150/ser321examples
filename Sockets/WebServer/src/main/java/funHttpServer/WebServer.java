@@ -224,7 +224,7 @@ class WebServer {
             builder.append("Invalid Data Entered");
           }
           //second if num1 or num2 is null/missing
-          else if((num1 == null) || (num2 == null)){
+          if((num1 == null) || (num2 == null)){
             builder.append("HTTP/1.1 206 Content Missing");
             builder.append("Content-Type: text/html; charset=utf-8\n");
             builder.append("\n");
