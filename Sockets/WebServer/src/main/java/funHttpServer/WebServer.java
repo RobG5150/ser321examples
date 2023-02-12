@@ -262,7 +262,7 @@ class WebServer {
           query_pairs = splitQuery(request.replace("github?", ""));
           String json = null;
           try {
-            String json = fetchURL("https://api.github.com/" + query_pairs.get("query") + "/repos");
+             json = fetchURL("https://api.github.com/" + query_pairs.get("query") + "/repos");
              JSONIn = new JSONArray(json);
              reposArr = new JSONArray();
           }
@@ -350,7 +350,8 @@ class WebServer {
 
           if(error == false){
             // do math
-            Integer result = Math.pow(num1, num2);
+            Integer result = null;
+            result = Math.pow(num1 , num2);
             // Generate response
             builder.append("HTTP/1.1 200 OK\n");
             builder.append("Content-Type: text/html; charset=utf-8\n");
