@@ -402,7 +402,7 @@ class WebServer {
 
           if(error == false){
             // do math
-            int i = null;
+            int i;
             if(num1 < num2){
               i = num1;
             }
