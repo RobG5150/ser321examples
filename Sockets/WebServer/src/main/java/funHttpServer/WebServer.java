@@ -209,11 +209,13 @@ class WebServer {
           query_pairs = splitQuery(request.replace("multiply?", ""));
           //error checker variable
           boolean error = false;
+          Integer num1 = null;
+          Integer num2 = null;
 
           // extract required fields from parameters
           try {
-            Integer num1 = Integer.parseInt(query_pairs.get("num1"));
-            Integer num2 = Integer.parseInt(query_pairs.get("num2"));
+             num1 = Integer.parseInt(query_pairs.get("num1"));
+             num2 = Integer.parseInt(query_pairs.get("num2"));
           }
 
           // TODO: Include error handling here with a correct error code and
@@ -254,12 +256,15 @@ class WebServer {
           // "Owner's repo is named RepoName. Example: find RepoName's contributors" translates to
           //     "/repos/OWNERNAME/REPONAME/contributors"
           boolean error2 = false;
+          JSONArray JSONIn = null;
+          JSONArray reposArr = null;
           Map<String, String> query_pairs = new LinkedHashMap<String, String>();
           query_pairs = splitQuery(request.replace("github?", ""));
+          String json = null;
           try {
             String json = fetchURL("https://api.github.com/" + query_pairs.get("query") + "/repos");
-            JSONArray JSONIn = new JSONArray(json);
-            JSONArray reposArr = new JSONArray();
+             JSONIn = new JSONArray(json);
+             reposArr = new JSONArray();
           }
           catch(IllegalArgumentException e){
             builder.append("HTTP/1.1 405 Method Not Allowed\n");
@@ -269,12 +274,12 @@ class WebServer {
             error2 = true;
           }
           if(error2 == false) {
-            for (int i = 0; x < JSONIn.length(); i++){
+            for (int i = 0; i < JSONIn.length(); i++){
               JSONObject repo = JSONIn.getJSONObject(i);
               String repoName = repo.getString("name");
               int repoID = repo.getInt("id");
               JSONObject repoOwner = repo.getJSONObject("owner");
-              String owner = jsonOwner.getString("login");
+              String owner = repoOwner.getString("login");
               JSONObject results = new JSONObject();
 
               results.put("name", repoName);
@@ -316,11 +321,12 @@ class WebServer {
           query_pairs = splitQuery(request.replace("power?", ""));
           //error checker variable
           boolean error = false;
-
+          Integer num1 = null;
+          Integer num2 = null;
           // extract required fields from parameters
           try {
-            Integer num1 = Integer.parseInt(query_pairs.get("num1"));
-            Integer num2 = Integer.parseInt(query_pairs.get("num2"));
+             num1 = Integer.parseInt(query_pairs.get("num1"));
+             num2 = Integer.parseInt(query_pairs.get("num2"));
           }
 
           // TODO: Include error handling here with a correct error code and
@@ -364,11 +370,14 @@ class WebServer {
           query_pairs = splitQuery(request.replace("GCD?", ""));
           //error checker variable
           boolean error = false;
+          Integer num1 = null;
+          Integer num2 = null;
+          Integer result = null;
 
           // extract required fields from parameters
           try {
-            Integer num1 = Integer.parseInt(query_pairs.get("num1"));
-            Integer num2 = Integer.parseInt(query_pairs.get("num2"));
+             num1 = Integer.parseInt(query_pairs.get("num1"));
+             num2 = Integer.parseInt(query_pairs.get("num2"));
           }
 
           // TODO: Include error handling here with a correct error code and
@@ -406,7 +415,7 @@ class WebServer {
               }
               result = 1;
             }
-            Integer result = num1 * num2;
+
             // Generate response
             builder.append("HTTP/1.1 200 OK\n");
             builder.append("Content-Type: text/html; charset=utf-8\n");
