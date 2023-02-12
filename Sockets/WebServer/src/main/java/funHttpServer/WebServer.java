@@ -269,7 +269,7 @@ class WebServer {
             error2 = true;
           }
           if(error2 == false) {
-            for (int i = 0; x < JSONIn.length(); i++ ;){
+            for (int i = 0; x < JSONIn.length(); i++){
               JSONObject repo = JSONIn.getJSONObject(i);
               String repoName = repo.getString("name");
               int repoID = repo.getInt("id");
