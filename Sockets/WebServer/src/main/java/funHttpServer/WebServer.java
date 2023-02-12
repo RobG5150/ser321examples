@@ -351,7 +351,7 @@ class WebServer {
           if(error == false){
             // do math
             Integer result = null;
-            result = Math.pow(num1 , num2);
+            result = (int) Math.pow(num1 , (num2);
             // Generate response
             builder.append("HTTP/1.1 200 OK\n");
             builder.append("Content-Type: text/html; charset=utf-8\n");
