@@ -362,18 +362,18 @@ class WebServer {
 
 
         }
-        else if (request.contains("GCD?")) {
+        else if (request.contains("LCD?")) {
           // This multiplies two numbers, there is NO error handling, so when
           // wrong data is given this just crashes
 
           Map<String, String> query_pairs = new LinkedHashMap<String, String>();
           // extract path parameters
-          query_pairs = splitQuery(request.replace("GCD?", ""));
+          query_pairs = splitQuery(request.replace("LCD?", ""));
           //error checker variable
           boolean error = false;
           Integer num1 = null;
           Integer num2 = null;
-          Integer result = null;
+          Integer result;
 
           // extract required fields from parameters
           try {
@@ -402,7 +402,7 @@ class WebServer {
 
           if(error == false){
             // do math
-            int i;
+            int i = null;
             if(num1 < num2){
               i = num1;
             }
@@ -410,7 +410,7 @@ class WebServer {
               i = num2;
             }
 
-            for(i = i; i > 1; i--){
+            for(i; i > num1; i--){
               if(num1 % i == 0 && num2 % i == 0){
                 result = i;
               }
