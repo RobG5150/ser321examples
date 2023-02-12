@@ -373,7 +373,7 @@ class WebServer {
           boolean error = false;
           Integer num1 = null;
           Integer num2 = null;
-          Integer result;
+          Integer result = null;
 
           // extract required fields from parameters
           try {
