@@ -25,6 +25,8 @@ import java.util.Random;
 import java.util.Map;
 import java.util.LinkedHashMap;
 import java.nio.charset.Charset;
+import org.json.*;
+import java.lang.Math;
 
 class WebServer {
   public static void main(String args[]) {
@@ -125,7 +127,8 @@ class WebServer {
       // Generate an appropriate response to the user
       if (request == null) {
         response = "<html>Illegal request: no GET</html>".getBytes();
-      } else {
+      }
+      else {
         // create output buffer
         StringBuilder builder = new StringBuilder();
         // NOTE: output from buffer is at the end
@@ -144,7 +147,8 @@ class WebServer {
           builder.append("\n");
           builder.append(page);
 
-        } else if (request.equalsIgnoreCase("json")) {
+        }
+        else if (request.equalsIgnoreCase("json")) {
           // shows the JSON of a random image and sets the header name for that image
 
           // pick a index from the map
@@ -163,7 +167,8 @@ class WebServer {
           builder.append("\"image\":\"").append(url).append("\"");
           builder.append("}");
 
-        } else if (request.equalsIgnoreCase("random")) {
+        }
+        else if (request.equalsIgnoreCase("random")) {
           // opens the random image page
 
           // open the index.html
@@ -175,7 +180,8 @@ class WebServer {
           builder.append("\n");
           builder.append(new String(readFileInBytes(file)));
 
-        } else if (request.contains("file/")) {
+        }
+        else if (request.contains("file/")) {
           // tries to find the specified file and shows it or shows an error
 
           // take the path and clean it. try to open the file
@@ -193,47 +199,53 @@ class WebServer {
             builder.append("\n");
             builder.append("File not found: " + file);
           }
-        } else if (request.contains("multiply?")) {
+        }
+        else if (request.contains("multiply?")) {
           // This multiplies two numbers, there is NO error handling, so when
           // wrong data is given this just crashes
 
           Map<String, String> query_pairs = new LinkedHashMap<String, String>();
           // extract path parameters
           query_pairs = splitQuery(request.replace("multiply?", ""));
+          //error checker variable
+          boolean error = false;
 
           // extract required fields from parameters
-          Integer num1 = Integer.parseInt(query_pairs.get("num1"));
-          Integer num2 = Integer.parseInt(query_pairs.get("num2"));
-
-          // do math
-          Integer result = num1 * num2;
-
-          // Generate response
-          builder.append("HTTP/1.1 200 OK\n");
-          builder.append("Content-Type: text/html; charset=utf-8\n");
-          builder.append("\n");
-          builder.append("Result is: " + result);
+          try {
+            Integer num1 = Integer.parseInt(query_pairs.get("num1"));
+            Integer num2 = Integer.parseInt(query_pairs.get("num2"));
+          }
 
           // TODO: Include error handling here with a correct error code and
           // a response that makes sense
-          //First if num1 or num2 is invalid
-          if(num1 != (int)num1 || num2 != (int)num2){
+          catch (NumberFormatException e){
             builder.append("HTTP/1.1 400 Bad Request");
             builder.append("Content-Type: text/html; charset=utf-8\n");
             builder.append("\n");
             builder.append("Invalid Data Entered");
+            error = true;
           }
+
           //second if num1 or num2 is null/missing
-          if((num1 == null) || (num2 == null)){
+          catch (IllegalArgumentException e){
             builder.append("HTTP/1.1 206 Content Missing");
             builder.append("Content-Type: text/html; charset=utf-8\n");
             builder.append("\n");
             builder.append("Missing Data");
+            error = true;
           }
 
-
-
-        } else if (request.contains("github?")) {
+          if(error == false){
+            // do math
+            Integer result = num1 * num2;
+            // Generate response
+            builder.append("HTTP/1.1 200 OK\n");
+            builder.append("Content-Type: text/html; charset=utf-8\n");
+            builder.append("\n");
+            builder.append("Result is: " + result);
+          }
+        }
+        else if (request.contains("github?")) {
           // pulls the query from the request and runs it with GitHub's REST API
           // check out https://docs.github.com/rest/reference/
           //
@@ -241,20 +253,171 @@ class WebServer {
           //     then drill down to what you care about
           // "Owner's repo is named RepoName. Example: find RepoName's contributors" translates to
           //     "/repos/OWNERNAME/REPONAME/contributors"
-
+          boolean error2 = false;
           Map<String, String> query_pairs = new LinkedHashMap<String, String>();
           query_pairs = splitQuery(request.replace("github?", ""));
-          String json = fetchURL("https://api.github.com/" + query_pairs.get("query"));
-          System.out.println(json);
+          try {
+            String json = fetchURL("https://api.github.com/" + query_pairs.get("query") + "/repos");
+            JSONArray JSONIn = new JSONArray(json);
+            JSONArray reposArr = new JSONArray();
+          }
+          catch(IllegalArgumentException e){
+            builder.append("HTTP/1.1 405 Method Not Allowed\n");
+            builder.append("Content Type: text/html; charset=utf-8\n");
+            builder.append("\n");
+            builder.append("No number values were entered");
+            error2 = true;
+          }
+          if(error2 == false) {
+            for (int i = 0; x < JSONIn.length(); i++ ;){
+              JSONObject repo = JSONIn.getJSONObject(i);
+              String repoName = repo.getString("name");
+              int repoID = repo.getInt("id");
+              JSONObject repoOwner = repo.getJSONObject("owner");
+              String owner = jsonOwner.getString("login");
+              JSONObject results = new JSONObject();
 
-          builder.append("HTTP/1.1 200 OK\n");
-          builder.append("Content-Type: text/html; charset=utf-8\n");
-          builder.append("\n");
-          builder.append("Check the todos mentioned in the Java source file");
-          // TODO: Parse the JSON returned by your fetch and create an appropriate
-          // response based on what the assignment document asks for
+              results.put("name", repoName);
+              results.put("id", repoID);
+              results.put("owner", owner);
 
-        } else {
+              reposArr.put(results);
+            }
+
+            System.out.println(json);
+
+            builder.append("HTTP/1.1 200 OK\n");
+            builder.append("Content-Type: text/html; charset=utf-8\n");
+            builder.append("\n");
+            for (int j = 0; j < reposArr.length(); j++) {
+              JSONObject finalResults = reposArr.getJSONObject(j);
+              String finalName = finalResults.getString("name");
+              int finalID = finalResults.getInt("id");
+              String finalOwner = finalResults.getString("owner");
+              builder.append(finalName + "" + finalID + "" + finalOwner);
+            }
+            // TODO: Parse the JSON returned by your fetch and create an appropriate
+            // response based on what the assignment document asks for
+          }
+          else{
+            builder.append("HTTP/1.1 400 bad Request:\n");
+            builder.append("Content-Type: text/html; charset=utf-8\n");
+            builder.append("\n");
+            builder.append("Unknown instruction");
+            builder.append("Checklist unsuccessful");
+          }
+        }
+        else if (request.contains("power?")) {
+          // This multiplies two numbers, there is NO error handling, so when
+          // wrong data is given this just crashes
+
+          Map<String, String> query_pairs = new LinkedHashMap<String, String>();
+          // extract path parameters
+          query_pairs = splitQuery(request.replace("power?", ""));
+          //error checker variable
+          boolean error = false;
+
+          // extract required fields from parameters
+          try {
+            Integer num1 = Integer.parseInt(query_pairs.get("num1"));
+            Integer num2 = Integer.parseInt(query_pairs.get("num2"));
+          }
+
+          // TODO: Include error handling here with a correct error code and
+          // a response that makes sense
+          catch (NumberFormatException e){
+            builder.append("HTTP/1.1 400 Bad Request");
+            builder.append("Content-Type: text/html; charset=utf-8\n");
+            builder.append("\n");
+            builder.append("Invalid Data Entered");
+            error = true;
+          }
+
+          //second if num1 or num2 is null/missing
+          catch (IllegalArgumentException e){
+            builder.append("HTTP/1.1 206 Content Missing");
+            builder.append("Content-Type: text/html; charset=utf-8\n");
+            builder.append("\n");
+            builder.append("Missing Data");
+            error = true;
+          }
+
+          if(error == false){
+            // do math
+            Integer result = Math.pow(num1, num2);
+            // Generate response
+            builder.append("HTTP/1.1 200 OK\n");
+            builder.append("Content-Type: text/html; charset=utf-8\n");
+            builder.append("\n");
+            builder.append("Result is: " + result);
+          }
+
+
+
+        }
+        else if (request.contains("GCD?")) {
+          // This multiplies two numbers, there is NO error handling, so when
+          // wrong data is given this just crashes
+
+          Map<String, String> query_pairs = new LinkedHashMap<String, String>();
+          // extract path parameters
+          query_pairs = splitQuery(request.replace("GCD?", ""));
+          //error checker variable
+          boolean error = false;
+
+          // extract required fields from parameters
+          try {
+            Integer num1 = Integer.parseInt(query_pairs.get("num1"));
+            Integer num2 = Integer.parseInt(query_pairs.get("num2"));
+          }
+
+          // TODO: Include error handling here with a correct error code and
+          // a response that makes sense
+          catch (NumberFormatException e){
+            builder.append("HTTP/1.1 400 Bad Request");
+            builder.append("Content-Type: text/html; charset=utf-8\n");
+            builder.append("\n");
+            builder.append("Invalid Data Entered");
+            error = true;
+          }
+
+          //second if num1 or num2 is null/missing
+          catch (IllegalArgumentException e){
+            builder.append("HTTP/1.1 206 Content Missing");
+            builder.append("Content-Type: text/html; charset=utf-8\n");
+            builder.append("\n");
+            builder.append("Missing Data");
+            error = true;
+          }
+
+          if(error == false){
+            // do math
+            int i;
+            if(num1 < num2){
+              i = num1;
+            }
+            else{
+              i = num2;
+            }
+
+            for(i = i; i > 1; i--){
+              if(num1 % i == 0 && num2 % i == 0){
+                result = i;
+              }
+              result = 1;
+            }
+            Integer result = num1 * num2;
+            // Generate response
+            builder.append("HTTP/1.1 200 OK\n");
+            builder.append("Content-Type: text/html; charset=utf-8\n");
+            builder.append("\n");
+            builder.append("Result is: " + result);
+          }
+
+
+
+        }
+        else {
           // if the request is not recognized at all
 
           builder.append("HTTP/1.1 400 Bad Request\n");
