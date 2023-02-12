@@ -262,7 +262,7 @@ class WebServer {
           query_pairs = splitQuery(request.replace("github?", ""));
           String json = null;
           try {
-             json = fetchURL("https://api.github.com/" + query_pairs.get("query") + "/repos");
+             json = fetchURL("https://api.github.com/" + query_pairs.get("query"));
              JSONIn = new JSONArray(json);
              reposArr = new JSONArray();
           }
