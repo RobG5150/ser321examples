@@ -410,7 +410,7 @@ class WebServer {
               i = num2;
             }
 
-            for(i; i > num1; i--){
+            for(i = i; i > num1; i--){
               if(num1 % i == 0 && num2 % i == 0){
                 result = i;
               }
