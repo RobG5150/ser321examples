@@ -414,7 +414,9 @@ class WebServer {
               if(num1 % i == 0 && num2 % i == 0){
                 result = i;
               }
-              result = 1;
+              else{
+                result = 1;
+              }
             }
 
             // Generate response
